@@ -1,9 +1,9 @@
 <script lang="ts">
 	import Encounters from './Encounters.svelte';
 	import SideEdit from './SideEdit.svelte';
-	import query from '../../results/query';
+	import {calculateOddsForEncounter, calculateOddsForEncounters} from '../../results/query';
 
-	import { activeEncounter, activeEncounterIndex, encounters, cardData } from '../../stores';
+	import { activeEncounter, activeEncounterIndex, encounters, cardData, operatorType } from '../../stores';
 
     
     function swapSides() {
@@ -21,14 +21,37 @@
         $encounters = [...$encounters, JSON.parse(JSON.stringify($activeEncounter))]
         $activeEncounterIndex = $encounters.length - 1
     }
+    function removeEncounter(index: number) {
+        if ($encounters.length === 1) {
+            return
+        }
+        // TODO: this is a dumb way to copy
+        $encounters = [...$encounters.slice(0, index), ...$encounters.slice(index + 1)]
+        // $activeEncounterIndex = $encounters.length - 1
+        $activeEncounterIndex = $activeEncounterIndex >= index ? $activeEncounterIndex - 1 : $activeEncounterIndex
+        console.log("removeEncounter", $encounters, $activeEncounterIndex)
+    }
+
+    function selectEncounter(index: number) {
+        console.log(`selectEncounter: activeEncounter was ${activeEncounterIndex}; now ${index}`)
+        $activeEncounterIndex = index;
+    }
+
+    function toggleOperatorType() {
+        const to = $operatorType === "AND" ? "OR" : "AND"
+        console.log(`toggleOperatorType from ${operatorType} to ${to}`)
+        $operatorType = to;
+    }
     
-    let result: number;
+    let oddsForCurrentEncounter: number;
+    let oddsForAllEncounters: number;
     let cardsAvailableToAttacker: Array<string> = [];
     let cardsAvailableToDefender: Array<string> = [];
     $: {
-        cardsAvailableToAttacker = Object.keys($cardData).filter((card: string) => !$activeEncounter.defender.cards.includes(card))
-        cardsAvailableToDefender = Object.keys($cardData).filter((card: string) => !$activeEncounter.attacker.cards.includes(card))
-        result = query($activeEncounter)
+        cardsAvailableToAttacker = Object.keys($cardData).filter((card: string) => !$activeEncounter.defender.cards.includes(card));
+        cardsAvailableToDefender = Object.keys($cardData).filter((card: string) => !$activeEncounter.attacker.cards.includes(card));
+        oddsForCurrentEncounter = calculateOddsForEncounter($activeEncounter);
+        oddsForAllEncounters = calculateOddsForEncounters($encounters, $operatorType);
         console.log("$activeEncounter", $activeEncounter)
     }
 </script>
@@ -62,7 +85,7 @@
 	<div class="col-lg-3">
 		<h3>Attacker's odds of victory</h3>
         <div class="row">
-            <span class="results" title="{result * 100}%">{Math.round(result * 100)}%</span>
+            <span class="results" title="{oddsForCurrentEncounter * 100}%">{Math.round(oddsForCurrentEncounter * 100)}%</span>
         </div>
 		<div class="row">
             <button class="btn btn-primary" on:click={addEncounter}>Add Encounter</button>
@@ -70,10 +93,27 @@
 	</div>
 </div>
 <hr>
-<div class="row">
-    <Encounters encounters={$encounters} />
+<Encounters
+    encounters={$encounters}
+    activeEncounterIndex={$activeEncounterIndex}
+    selectEncounter={selectEncounter}
+    removeEncounter={removeEncounter}
+    operatorType={$operatorType}
+    toggleOperatorType={toggleOperatorType}
+/>
+<div >
+    <span class="results-text">
+        Probability of winning {$operatorType === "OR" ? "at least one encounter" : "all encounters"}:
+    </span>
+    
+
 </div>
 
+<div>
+    <span class="results" title="{oddsForAllEncounters * 100}%f">
+        {Math.round(oddsForAllEncounters * 100)}%
+   </span>
+</div>
 
 <style>
 	.swapper {
@@ -81,7 +121,9 @@
         font-weight: bolder;
 		text-align: center;
 	}
-
+    .results-text {
+		font-size: 1.25em;
+    }
     .results {
         font-size: 2em;
         font-weight: bolder;

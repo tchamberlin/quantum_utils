@@ -1,21 +1,23 @@
 <script lang="ts">
     import SideSimple from './SideSimple.svelte';
-    import query from '../../results/query';
+    import {calculateOddsForEncounter} from '../../results/query';
 	
     export let encounter;
     let result;
     $: {
-        result = query(encounter)
+        result = calculateOddsForEncounter(encounter)
     }
 </script>
 
-<div class="encounter d-inline-flex flex-column">
+<!-- svelte-ignore a11y-click-events-have-key-events -->
+<div class="d-inline-flex flex-column">
+    
     <div class="d-inline-flex flex-row bd-highlight align-items-center justify-content-center">
         <div class="bd-highlight">
             <SideSimple side={{side: "attacker", ...encounter.attacker}} />
         </div>
-        <div class="bd-highlight">
-            :
+        <div class="attack-symbol bd-highlight">
+            <span>&#8758;</span> <!-- Ratio symbol -->
         </div>
         <div class="bd-highlight">
             <SideSimple side={{side: "defender", ...encounter.defender}} />
@@ -27,13 +29,14 @@
     </div>
 </div>
 <style>
-    .encounter {
-        border: 1px white solid;
-        padding:  1em;
-    }
+    
     .results {
         /*font-size: 2em;
         font-weight: bolder;*/
         text-align:  center;
+    }
+    .attack-symbol {
+        text-align:  center;
+        font-size: 3em;
     }
 </style>

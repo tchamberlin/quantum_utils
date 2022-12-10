@@ -7,7 +7,7 @@
 
 </script>
 
-		<Die number={side.ship} side={side.side} />
+<Die number={side.ship} side={side.side} />
 
 <style>
 	.die-image {

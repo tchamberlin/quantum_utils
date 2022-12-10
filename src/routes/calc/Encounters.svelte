@@ -1,36 +1,60 @@
 <script lang="ts">
 	import Encounter from './Encounter.svelte';
-    import query from '../../results/query';
-    import EncounterParser from '../../encounter_parser'
+	import Operator from './Operator.svelte';
 
     export let encounters = [];
-    console.log("encounters!", encounters)
-    let tokens = [];
-    let result = 0;
-    // $: {
-    //     tokens = [];
-    //     encounters.forEach(encounter => {
-    //         tokens.push({type: "number", literal: query(encounter)}),
-    //         tokens.push({type: "|"})
-    //     })
-    //     tokens = tokens.slice(0, tokens.length - 1);
-    //     console.log("tokens", tokens)
-    //     const ep = new EncounterParser(tokens);
-    //     result = ep.parse_expression();
-    //     console.log("result", result)
-    // }
-
+    export let activeEncounterIndex: number;
+    export let selectEncounter;
+    export let removeEncounter;
+    export let operatorType;
+    export let toggleOperatorType;
 </script>
 
 
 <style>
+    .active-encounter {
+        border-color: #375a7f;
+
+    }
+    .encounter {
+        /* border: 4px solid; */
+        border-style: solid;
+        border-width: 4px;
+        /* background-color: white; */
+        padding: 1rem;
+        cursor: pointer;
+    }
+    .inactive-encounter {
+        border-color: var(--bs-gray);
+
+    }
+    .encounter-close-button {
+        display: block;
+        float: right;
+        position: absolute;
+        margin:3px
+    }
+    .operator {
+        cursor: pointer;
+    }
 </style>
 
-<div class="encounter m-1 p-1">
-{#each encounters as encounter, i}
-    <Encounter encounter={encounter} />
-{/each}
-
+<div class="d-flex flex-row m-1 p-1 align-items-center">
+    {#each encounters as encounter, i}
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <div  class="d-inline-flex flex-column"  >
+        <div>
+            <button type="button" class="encounter-close-button btn-close btn-sm" aria-label="Close" on:click={() => removeEncounter(i)}></button>
+        </div>
+        <div class="encounter" class:active-encounter={activeEncounterIndex === i} class:inactive-encounter={activeEncounterIndex !== i} on:click={() => selectEncounter(i)}>
+            <Encounter encounter={encounter}/>
+        </div>
+        
+    </div>
+    {#if encounters.length > 1 && i !== encounters.length - 1}
+        <div class="d-inline-flex flex-column m-2 operator" on:click={toggleOperatorType}>
+            <Operator type={operatorType} />
+        </div>
+    {/if}
+    {/each}
 </div>
-
-<span class="results" title="{result * 100}%">{Math.round(result * 100)}%</span>

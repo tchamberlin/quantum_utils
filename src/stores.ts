@@ -1,6 +1,5 @@
 import { readable, writable, derived } from 'svelte/store';
 import { cardItems } from './constants';
-import { EncounterGraph } from './tree';
 
 import type { Card, Encounter } from './types';
 
@@ -26,6 +25,7 @@ const _defaultEncounter: Encounter = {
 export const encounters = writable([_defaultEncounter]);
 
 export const activeEncounterIndex = writable(0);
+export const operatorType = writable("OR");
 export const activeEncounter = derived(
 	[activeEncounterIndex, encounters],
 	([$activeEncounterIndex, $encounters]) => $encounters[$activeEncounterIndex]
@@ -92,4 +92,3 @@ const _shipData = {
 export const shipData = readable(_shipData);
 
 
-export const encounterGraph = writable(new EncounterGraph());
