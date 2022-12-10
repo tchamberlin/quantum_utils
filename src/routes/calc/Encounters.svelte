@@ -52,6 +52,7 @@
         
     </div>
     {#if encounters.length > 1 && i !== encounters.length - 1}
+        <!-- svelte-ignore a11y-click-events-have-key-events -->
         <div class="d-inline-flex flex-column m-2 operator" on:click={toggleOperatorType}>
             <Operator type={operatorType} />
         </div>

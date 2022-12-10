@@ -1,9 +1,8 @@
 <!-- drag and drop will still be really useful for the re-ordering of encounters? -->
 <script lang="ts">
-	import { ListGroup, ListGroupItem } from 'sveltestrap';
+	import { ListGroupItem } from 'sveltestrap/src';
 
 	import { cardData, encounters, activeEncounterIndex } from '../../stores';
-	import type { Card } from '../../types';
 
     type CardState = {
         value: string,
@@ -62,6 +61,7 @@
 
 <div class="grid-container">
 	{#each Object.values(cardsState) as cardState}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class="quantum-card" on:click={() => onClickCard(cardState)}>
 			<ListGroupItem
 				active={cardState.active}

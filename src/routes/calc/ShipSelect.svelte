@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ListGroup, ListGroupItem } from 'sveltestrap';
+	import { ListGroupItem } from 'sveltestrap/src';
 	import Die from './Die.svelte';
 
     import { activeEncounterIndex, encounters } from '../../stores';
@@ -10,6 +10,7 @@
 
 <div class="grid-container">
 	{#each Object.entries(diceInfo) as [number, { alt, imagePath }]}
+		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class="ship" on:click={() => ($encounters[$activeEncounterIndex][side].ship = Number(number))}>
 			<ListGroupItem active={$encounters[$activeEncounterIndex][side].ship === Number(number)} class="p-1">
 				<Die number={number} side={side} />
