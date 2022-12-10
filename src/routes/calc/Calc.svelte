@@ -1,130 +1,90 @@
 <script lang="ts">
-	import Encounter from '$lib/Header/Encounter.svelte';
-	import Side from './Side.svelte';
+	import Encounters from './Encounters.svelte';
+	import SideEdit from './SideEdit.svelte';
 	import query from '../../results/query';
 
-	import { quantumCards, activeEncounter } from '../../stores';
+	import { activeEncounter, activeEncounterIndex, encounters, cardData } from '../../stores';
 
-	function onCardDragStart(event, cardItem) {
-		console.log('onCardDragStart', event);
-		event.dataTransfer.setData('text/plain', cardItem.value);
-	}
+    
+    function swapSides() {
+        
+        const attacker = $activeEncounter["attacker"]
+        const defender = $activeEncounter["defender"]
+        $encounters[$activeEncounterIndex] = {
+            attacker: defender,
+            defender: attacker
+        }
+    }
 
-	function onShipClick(ship) {}
-
-	function handleAddEncounter() {
-		encounters = [
-			...encounters,
-			{ attackerShip: $activeEncounter.attackerShip, defenderShip: $activeEncounter.defenderShip }
-		];
-	}
-
-	function swapSides() {
-		console.log('$activeEncounter was', $activeEncounter);
-		const { attackerShip, defenderShip, attackerCards, defenderCards } = $activeEncounter;
-		$activeEncounter = {
-			attackerShip: defenderShip,
-			defenderShip: attackerShip,
-			attackerCards: [...defenderCards],
-			defenderCards: [...attackerCards]
-		};
-		$quantumCards = Object.values($quantumCards).reduce((prev, card) => {
-			if (card.owned) {
-				if (card.owned === 'Attacker') {
-					card.owned = 'Defender';
-				} else if (card.owned === 'Defender') {
-					card.owned = 'Attacker';
-				}
-			}
-			return { ...prev, [card.value]: { ...card } };
-		}, {});
-	}
-
-	// function swapSides() {
-	//     console.log("$activeEncounter was", $activeEncounter)
-	//     const {attackerShip, defenderShip, attackerCards, defenderCards} = $activeEncounter;
-	//     $activeEncounter.attackerShip = defenderShip;
-	//     $activeEncounter.defenderShip = attackerShip;
-	//     $activeEncounter.attackerCards = [...defenderCards];
-	//     $activeEncounter.defenderCards = [...attackerCards];
-	//     console.log("$activeEncounter now", $activeEncounter)
-	// }
-
-	let result = null;
-	let encounters = [];
-	$: {
-		$activeEncounter.attackerCards = Object.values($quantumCards)
-			.filter(({ owned }) => owned == 'Attacker')
-			.map((card) => card.value);
-		$activeEncounter.defenderCards = Object.values($quantumCards)
-			.filter(({ owned }) => owned == 'Defender')
-			.map((card) => card.value);
-		result = query({
-			attackerShip: $activeEncounter.attackerShip,
-			defenderShip: $activeEncounter.defenderShip,
-			attackerHand: $activeEncounter.attackerCards,
-			defenderHand: $activeEncounter.defenderCards
-		});
-	}
+    function addEncounter() {
+        // TODO: this is a dumb way to copy
+        $encounters = [...$encounters, JSON.parse(JSON.stringify($activeEncounter))]
+        $activeEncounterIndex = $encounters.length - 1
+    }
+    
+    let result: number;
+    let cardsAvailableToAttacker: Array<string> = [];
+    let cardsAvailableToDefender: Array<string> = [];
+    $: {
+        cardsAvailableToAttacker = Object.keys($cardData).filter((card: string) => !$activeEncounter.defender.cards.includes(card))
+        cardsAvailableToDefender = Object.keys($cardData).filter((card: string) => !$activeEncounter.attacker.cards.includes(card))
+        result = query($activeEncounter)
+        console.log("$activeEncounter", $activeEncounter)
+    }
 </script>
 
 <h1>Combat Calculator</h1>
 
 <div class="row">
-	<div class="col-xs-11">
+	<div class="col-lg-9">
 		<div class="row align-items-center">
-			<div class="col-sm-5">
-				<h2>Attacker</h2>
-				<Side side="Attacker" diceKey="attackerShip" />
+			<div class="col-auto">
+				<h3>Attacker ({$activeEncounter["attacker"].name})</h3>
+				<SideEdit side="attacker" />
 			</div>
 			<div class="col-sm-1">
 				<div class="d-flex pt-2 justify-content-center">
-					<button class="mx-auto btn btn-outline-light btn-small" on:click={swapSides}>⇄</button>
+					<button
+                        class="swapper mx-auto btn btn-outline-light"
+                        on:click={swapSides}
+                        title="Swap attacker/defender"
+                    >
+                        ⇄
+                    </button>
 				</div>
 			</div>
 			<div class="col-sm-5">
-				<h2>Defender</h2>
-				<Side side="Defender" diceKey="defenderShip" />
+				<h3>Defender ({$activeEncounter["defender"].name})</h3>
+				<SideEdit side="defender" />
 			</div>
 		</div>
 	</div>
-	<div class="col-xs-1">
-		<h2>Results</h2>
-		<span>{Math.round(result * 100)}%</span>
-		<button class="btn btn-primary" on:click={handleAddEncounter}>Add Encounter</button>
+	<div class="col-lg-3">
+		<h3>Attacker's odds of victory</h3>
+        <div class="row">
+            <span class="results" title="{result * 100}%">{Math.round(result * 100)}%</span>
+        </div>
+		<div class="row">
+            <button class="btn btn-primary" on:click={addEncounter}>Add Encounter</button>
+        </div>    
 	</div>
 </div>
+<hr>
 <div class="row">
-	{#each encounters as { attackerShip, defenderShip }}
-		<Encounter {attackerShip} {defenderShip} />
-	{/each}
+    <Encounters encounters={$encounters} />
 </div>
 
+
 <style>
-	/* :global(.dice-group > *) {
-        margin: .25rem;
-    } */
-
-	.quantum-cards :first-child {
-		margin-left: 0;
-	}
-
-	.quantum-cards :last-child {
-		margin-right: 0;
-	}
-
-	.quantum-cards > * {
-		margin: 0.25rem;
-		padding: 0.25rem;
-		cursor: grab;
-	}
-
-	.quantum-card {
-		border: white 1px solid;
-	}
-
 	.swapper {
-		font-size: 2em;
+		font-size: 1.25em;
+        font-weight: bolder;
 		text-align: center;
 	}
+
+    .results {
+        font-size: 2em;
+        font-weight: bolder;
+		text-align: center;
+    }
 </style>

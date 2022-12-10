@@ -1,10 +1,10 @@
 import all_data from '.';
 
-const queryResults = ({ attackerShip, defenderShip, attackerHand, defenderHand }) => {
-	console.log('queryResults', attackerShip, attackerHand);
-	const attackerAdvantageKey = JSON.stringify(attackerShip - defenderShip);
-	const attackerHandKey = attackerHand.sort().join('|');
-	const defenderHandKey = defenderHand.sort().join('|');
+const queryResults = ({ attacker, defender }) => {
+	console.log("query", attacker, defender)
+	const attackerAdvantageKey = JSON.stringify(attacker.ship - defender.ship);
+	const attackerHandKey = attacker.cards.sort().join('|');
+	const defenderHandKey = defender.cards.sort().join('|');
 	const attackerWinRatio = all_data[attackerAdvantageKey][attackerHandKey][defenderHandKey];
 
 	return attackerWinRatio;

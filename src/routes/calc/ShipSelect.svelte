@@ -1,29 +1,24 @@
 <script lang="ts">
-	import { activeEncounter } from '../../stores';
-
 	import { ListGroup, ListGroupItem } from 'sveltestrap';
+	import Die from './Die.svelte';
+
+    import { activeEncounterIndex, encounters } from '../../stores';
 
 	import { diceInfo } from '../../constants';
-	export let diceKey: string;
-	console.log('ShipSelect key', diceKey);
+    export let side: string;
 </script>
 
 <div class="grid-container">
 	{#each Object.entries(diceInfo) as [number, { alt, imagePath }]}
-		<div class="ship" on:click={() => ($activeEncounter[diceKey] = Number(number))}>
-			<ListGroupItem active={$activeEncounter[diceKey] === Number(number)} class="p-1">
-				<img class="die-image" src={imagePath} {alt} />
+		<div class="ship" on:click={() => ($encounters[$activeEncounterIndex][side].ship = Number(number))}>
+			<ListGroupItem active={$encounters[$activeEncounterIndex][side].ship === Number(number)} class="p-1">
+				<Die number={number} side={side} />
 			</ListGroupItem>
 		</div>
 	{/each}
 </div>
 
 <style>
-	.die-image {
-		font-size: 1.5em;
-		width: 1.5em;
-		height: 1.5em;
-	}
 	.ship {
 		cursor: pointer;
 	}

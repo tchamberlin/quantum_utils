@@ -1,5 +1,6 @@
-import { writable } from 'svelte/store';
+import { readable, writable, derived } from 'svelte/store';
 import { cardItems } from './constants';
+import { EncounterGraph } from './tree';
 
 import type { Card, Encounter } from './types';
 
@@ -9,10 +10,86 @@ const _quantumCards: { [card: string]: Card } = cardItems.reduce(
 );
 export const quantumCards = writable(_quantumCards);
 
-const _initialEncounter: Encounter = {
-	attackerShip: 1,
-	defenderShip: 1,
-	attackerCards: [],
-	defenderCards: []
+const _defaultEncounter: Encounter = {
+	attacker: {
+        name: "You",
+        ship: 1,
+        cards: []
+    },
+	defender: {
+        name: "Them",
+        ship: 1,
+        cards: []
+    }
 };
-export const activeEncounter = writable(_initialEncounter);
+
+export const encounters = writable([_defaultEncounter]);
+
+export const activeEncounterIndex = writable(0);
+export const activeEncounter = derived(
+	[activeEncounterIndex, encounters],
+	([$activeEncounterIndex, $encounters]) => $encounters[$activeEncounterIndex]
+)
+
+
+const _cardData = {
+    'ferocious': {
+        value: 'ferocious',
+		label: 'Ferocious',
+		abbreviation: 'F',
+		description: '-1 combat bonus',
+		advantage: -1
+	},
+	'relentless': {
+        value: 'relentless',
+		label: 'Relentless',
+		abbreviation: 'R',
+		description: 'Optionally re-roll your combat die once'
+	},
+	'cruel': {
+        value: 'cruel',
+		label: 'Cruel',
+		abbreviation: 'C',
+		description: "Optionally re-roll your opponent's combat die once"
+	},
+	'scrappy': {
+        value: 'scrappy',
+		label: 'Scrappy',
+		abbreviation: 'Sy',
+		description: 'On your turn, optionally re-roll your combat die once'
+	},
+	'strategic': {
+        value: 'strategic',
+		label: 'Strategic',
+		abbreviation: 'Sc',
+		description: '-2 combat bonus if adjacent to another of you ships',
+		advantage: -2
+	},
+	'rational': {
+        value: 'rational',
+		label: 'Rational',
+		abbreviation: 'R',
+		description: 'Your combat die always rolls to 3'
+	},
+	'stubborn': {
+        value: 'stubborn',
+		label: 'Stubborn',
+		abbreviation: 'Sn',
+		description: 'As defender, break ties (and destroy your attacker if they lose)'
+	}
+}
+export const cardData = readable(_cardData);
+
+
+const _shipData = {
+	1: { value: 1, name: 'Battlestation', description: '' },
+	2: { value: 2, name: 'Flagship', description: '' },
+	3: { value: 3, name: 'Destroyer', description: '' },
+	4: { value: 4, name: 'Frigate', description: '' },
+	5: { value: 5, name: 'Interceptor', description: '' },
+	6: { value: 6, name: 'Scout', description: '' }
+};
+export const shipData = readable(_shipData);
+
+
+export const encounterGraph = writable(new EncounterGraph());

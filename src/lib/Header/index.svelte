@@ -18,10 +18,10 @@
 		<Collapse {isOpen} navbar expand="md" on:update={handleUpdate}>
 			<Nav navbar>
 				<NavItem>
-					<NavLink href="./" active={$page.path === '/'}>Home</NavLink>
+					<NavLink href="./" active={$page.url.pathname === '/'}>Home</NavLink>
 				</NavItem>
 				<NavItem>
-					<NavLink href="./calc" active={$page.path === '/calc'}>Calc</NavLink>
+					<NavLink href="./calc" active={$page.url.pathname === '/calc'}>Calc</NavLink>
 				</NavItem>
 			</Nav>
 		</Collapse>

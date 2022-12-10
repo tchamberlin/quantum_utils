@@ -6,11 +6,23 @@ export interface Card {
 	advantage: number;
 }
 
-export interface Encounter {
-	attackerShip: number;
-	defenderShip: number;
-	attackerCards: Array<string>;
-	defenderCards: Array<string>;
+// (card.owned !== side && card.owned !== null) || ownedCards >= 3
+
+export interface Ship {
+    value: number;
+    name: string;
+    description: string;
 }
 
-// (card.owned !== side && card.owned !== null) || ownedCards >= 3
+export interface Player {
+    name: string;
+    ship: number;
+    cards: Array<string>;
+}
+
+export interface Encounter {
+    attacker: Player;
+    defender: Player;
+}
+
+export type Encounters = Array<Encounter>;

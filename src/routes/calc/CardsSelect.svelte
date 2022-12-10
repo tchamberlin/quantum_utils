@@ -2,42 +2,73 @@
 <script lang="ts">
 	import { ListGroup, ListGroupItem } from 'sveltestrap';
 
-	import { quantumCards } from '../../stores';
+	import { cardData, encounters, activeEncounterIndex } from '../../stores';
+	import type { Card } from '../../types';
 
-	function handleCardClick(clickedCard) {
-		if (clickedCard.owned === null) {
-			if (ownedCards < 3) {
-				clickedCard.owned = side;
-			}
-		} else if (clickedCard.owned === side) {
-			clickedCard.owned = null;
-		}
+    type CardState = {
+        value: string,
+        label: string,
+        active: boolean,
+        disabled: boolean,
+    };
 
-		$quantumCards = { ...$quantumCards, [clickedCard.value]: clickedCard };
-		console.log('$quantumCards', $quantumCards);
-	}
+    function onClickCard(cardState: CardState) {
+        if (!cardState.active) {
+            if ($encounters[$activeEncounterIndex][side].cards.length < 3 && !cardState.disabled) {
+                $encounters[$activeEncounterIndex][side].cards = [...$encounters[$activeEncounterIndex][side].cards, cardState.value]
+            }
+        } else  {
+            $encounters[$activeEncounterIndex][side].cards = $encounters[$activeEncounterIndex][side].cards.filter(card => card !== cardState.value)
+        }
+    }
 
-	let ownedCards = 0;
+    function isDisabled(card) {
+        return (
+            !$encounters[$activeEncounterIndex][side].cards.includes(card.value) && (
+                $encounters[$activeEncounterIndex][side === "attacker" ? "defender" : "attacker"].cards.includes(card.value) ||
+                $encounters[$activeEncounterIndex][side].cards.length >= 3
+            )
+        );
+    }
+
+
+    let cardsState: {[key: string]: CardState};
 	$: {
-		ownedCards = Object.values($quantumCards).filter((card) => card.owned === side).length;
+        cardsState = Object.values($cardData).reduce((prev, card) => (
+            {
+                ...prev,
+                [card.label]: {
+                    value: card.value,
+                    label: card.label,
+                    active: $encounters[$activeEncounterIndex][side].cards.includes(card.value),
+                    disabled: isDisabled(card)
+                }
+            }
+            ),
+            {}
+        )
 	}
+
+    $: {
+        console.log("$encounters[$activeEncounterIndex][side]", $encounters[$activeEncounterIndex][side])
+        console.log("cardsState", cardsState)
+    }
 	export let side: string;
 
-	console.log('side', side);
 </script>
 
 <!-- TODO: would probably be better to ditch the drag/drop and do a modal-ish thing instead. click to toggle to selection screen. no actual modal though, just in place? -->
 
 
 <div class="grid-container">
-	{#each Object.values($quantumCards) as card}
-		<div class="quantum-card" on:click={() => handleCardClick(card)}>
+	{#each Object.values(cardsState) as cardState}
+		<div class="quantum-card" on:click={() => onClickCard(cardState)}>
 			<ListGroupItem
-				active={card.owned === side}
-				disabled={(card.owned !== side && card.owned !== null) || ownedCards >= 3}
+				active={cardState.active}
+				disabled={cardState.disabled}
 				class="small-list-item"
 			>
-				{card.label}
+				{cardState.label}
 			</ListGroupItem>
 		</div>
 	{/each}
