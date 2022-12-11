@@ -4,16 +4,17 @@
 
 	export let encounters = [];
 	export let activeEncounterIndex: number;
-	export let selectEncounter;
-	export let removeEncounter;
-	export let operatorType;
-	export let toggleOperatorType;
+	export let selectEncounter: Function;
+	export let removeEncounter: Function;
+	export let operatorType: string;
+	export let toggleOperatorType: Function;
 </script>
 
-<div class="d-flex flex-row m-1 p-1 align-items-center">
+<div class="d-flex flex-row m-1 p-1 align-items-center flex-lg-wrap">
 	{#each encounters as encounter, i}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div class="d-inline-flex flex-column">
+			{#if encounters.length > 1}
 			<div>
 				<button
 					type="button"
@@ -22,6 +23,7 @@
 					on:click={() => removeEncounter(i)}
 				/>
 			</div>
+			{/if}
 			<div
 				class="encounter"
 				class:active-encounter={activeEncounterIndex === i}
@@ -33,7 +35,7 @@
 		</div>
 		{#if encounters.length > 1 && i !== encounters.length - 1}
 			<!-- svelte-ignore a11y-click-events-have-key-events -->
-			<div class="d-inline-flex flex-column m-2 operator" on:click={toggleOperatorType}>
+			<div class="d-inline-flex flex-column m-2 operator" on:click={() => toggleOperatorType()}>
 				<Operator type={operatorType} />
 			</div>
 		{/if}

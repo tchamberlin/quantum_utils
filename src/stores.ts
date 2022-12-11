@@ -1,4 +1,4 @@
-import { readable, writable, derived } from 'svelte/store';
+import { readable, writable, derived, type Writable } from 'svelte/store';
 import { cardItems } from './constants';
 
 import type { Card, Encounter } from './types';
@@ -31,6 +31,10 @@ export const activeEncounter = derived(
 	([$activeEncounterIndex, $encounters]) => $encounters[$activeEncounterIndex]
 );
 
+const _defaultCards: string[] = [];
+export const attackerCards = writable(_defaultCards)
+export const defenderCards = writable(_defaultCards)
+
 const _cardData = {
 	ferocious: {
 		value: 'ferocious',
@@ -42,7 +46,7 @@ const _cardData = {
 	relentless: {
 		value: 'relentless',
 		label: 'Relentless',
-		abbreviation: 'R',
+		abbreviation: 'Rs',
 		description: 'Optionally re-roll your combat die once'
 	},
 	cruel: {
@@ -67,7 +71,7 @@ const _cardData = {
 	rational: {
 		value: 'rational',
 		label: 'Rational',
-		abbreviation: 'R',
+		abbreviation: 'Rl',
 		description: 'Your combat die always rolls to 3'
 	},
 	stubborn: {

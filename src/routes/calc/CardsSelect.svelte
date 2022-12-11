@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { ListGroupItem } from 'sveltestrap/src';
 
-	import { cardData, encounters, activeEncounterIndex } from '../../stores';
+	import { cardData, encounters, activeEncounterIndex, attackerCards, defenderCards } from '../../stores';
 
 	type CardState = {
 		value: string;
@@ -18,11 +18,27 @@
 					...$encounters[$activeEncounterIndex][side].cards,
 					cardState.value
 				];
+				// TODO: gross
+				if (side === "attacker") {
+					if (!$attackerCards.includes(cardState.value)) {
+						$attackerCards = [cardState.value, ...$attackerCards]
+					}
+				} else {
+					if (!$defenderCards.includes(cardState.value)) {
+						$defenderCards = [cardState.value, ...$defenderCards]
+					}
+				}
 			}
 		} else {
 			$encounters[$activeEncounterIndex][side].cards = $encounters[$activeEncounterIndex][
 				side
 			].cards.filter((card) => card !== cardState.value);
+			// TODO: gross
+			if (side === "attacker") {
+				$attackerCards = $attackerCards.filter((card) => card !== cardState.value);
+			} else {
+				$defenderCards = $defenderCards.filter((card) => card !== cardState.value);
+			}
 		}
 	}
 
@@ -67,7 +83,7 @@
 <div class="grid-container">
 	{#each Object.values(cardsState) as cardState}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class="quantum-card" on:click={() => onClickCard(cardState)}>
+		<div class={cardState.disabled ? "disabled-quantum-card" : "quantum-card"} on:click={() => onClickCard(cardState)}>
 			<ListGroupItem
 				active={cardState.active}
 				disabled={cardState.disabled}
@@ -82,6 +98,9 @@
 <style>
 	.quantum-card {
 		cursor: pointer;
+	}
+	.disabled-quantum-card {
+		cursor: not-allowed;
 	}
 
 	.grid-container {
