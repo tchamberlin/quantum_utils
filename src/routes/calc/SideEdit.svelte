@@ -2,7 +2,7 @@
 	import CardsSelect from './CardsSelect.svelte';
 	import ShipSelect from './ShipSelect.svelte';
 
-    export let side: string;
+	export let side: string;
 </script>
 
 <div class="d-flex">

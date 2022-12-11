@@ -1,5 +1,13 @@
 <script lang="ts">
-	import { Collapse, Navbar, NavbarToggler, NavbarBrand, Nav, NavItem, NavLink } from 'sveltestrap/src';
+	import {
+		Collapse,
+		Navbar,
+		NavbarToggler,
+		NavbarBrand,
+		Nav,
+		NavItem,
+		NavLink
+	} from 'sveltestrap/src';
 	// import githubLogo from './icons/GitHub-Mark-32px.png';
 
 	import { page } from '$app/stores';

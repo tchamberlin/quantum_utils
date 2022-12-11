@@ -2,18 +2,24 @@
 	import { ListGroupItem } from 'sveltestrap/src';
 	import Die from './Die.svelte';
 
-    import { activeEncounterIndex, encounters } from '../../stores';
+	import { activeEncounterIndex, encounters } from '../../stores';
 
 	import { diceInfo } from '../../constants';
-    export let side: string;
+	export let side: string;
 </script>
 
 <div class="grid-container">
 	{#each Object.entries(diceInfo) as [number, { alt, imagePath }]}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
-		<div class="ship" on:click={() => ($encounters[$activeEncounterIndex][side].ship = Number(number))}>
-			<ListGroupItem active={$encounters[$activeEncounterIndex][side].ship === Number(number)} class="p-1">
-				<Die number={number} side={side} />
+		<div
+			class="ship"
+			on:click={() => ($encounters[$activeEncounterIndex][side].ship = Number(number))}
+		>
+			<ListGroupItem
+				active={$encounters[$activeEncounterIndex][side].ship === Number(number)}
+				class="p-1"
+			>
+				<Die {number} {side} />
 			</ListGroupItem>
 		</div>
 	{/each}

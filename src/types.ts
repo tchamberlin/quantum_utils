@@ -9,20 +9,20 @@ export interface Card {
 // (card.owned !== side && card.owned !== null) || ownedCards >= 3
 
 export interface Ship {
-    value: number;
-    name: string;
-    description: string;
+	value: number;
+	name: string;
+	description: string;
 }
 
 export interface Player {
-    name: string;
-    ship: number;
-    cards: Array<string>;
+	name: string;
+	ship: number;
+	cards: Array<string>;
 }
 
 export interface Encounter {
-    attacker: Player;
-    defender: Player;
+	attacker: Player;
+	defender: Player;
 }
 
 export type Encounters = Array<Encounter>;
