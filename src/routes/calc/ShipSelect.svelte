@@ -12,12 +12,12 @@
 	{#each Object.entries(diceInfo) as [number, { alt, imagePath }]}
 		<!-- svelte-ignore a11y-click-events-have-key-events -->
 		<div
-			class="ship"
 			on:click={() => ($encounters[$activeEncounterIndex][side].ship = Number(number))}
+			class="ship"
 		>
 			<ListGroupItem
 				active={$encounters[$activeEncounterIndex][side].ship === Number(number)}
-				class="p-1"
+				class={`${!($encounters[$activeEncounterIndex][side].ship === Number(number)) && (side === "defender" ? "bg-secondary" : "bg-secondary")} p-1`}
 			>
 				<Die {number} {side} />
 			</ListGroupItem>

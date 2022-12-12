@@ -13,12 +13,8 @@
 </script>
 
 <div class={`face ${side === 'attacker' ? 'attacker-face' : 'defender-face'}`}>
-	{#each dice[number] as isPip}
-		{#if isPip}
-			<span class={`pip ${side === 'attacker' ? 'attacker-pip' : 'defender-pip'}`} />
-		{:else}
-			<span class="no-pip" />
-		{/if}
+	{#each dice[number] as showPip}
+		<span class={`pip ${showPip && (side === 'attacker' ? 'attacker-pip' : 'defender-pip')}`} />
 	{/each}
 </div>
 
@@ -27,43 +23,35 @@
 		display: grid;
 		grid-template-columns: auto auto auto;
 		justify-content: center;
-		/*margin: 1px;*/
-		padding: 2px;
+		padding: 3px;
+		border-radius: 5%;
+		
 	}
-
 	.attacker-face {
 		background-color: var(--bs-dark);
+		/* box-shadow: inset 0 1px #111, inset 0 -1px rgb(94, 94, 94), inset 1px 0 rgb(143, 143, 143), inset -1px 0 rgb(143, 143, 143); */
 	}
-
 	.defender-face {
 		background-color: var(--bs-light);
-	}
-
-	.no-pip {
-		display: block;
-		height: 15px;
-		/*margin: 2px;*/
-
-		width: 15px;
+		/* box-shadow: inset 0 1px white, inset 0 -1px #bbb, inset 1px 0 #d7d7d7, inset -1px 0 #d7d7d7; */
 	}
 
 	.pip {
 		justify-self: center;
 		align-self: center;
 		border-radius: 50%;
-		background-color: var(--bs-light);
-		/*box-shadow: inset 0 3px #111, inset 0 -3px #555;*/
 		display: block;
 		height: 15px;
 		width: 15px;
-		margin: 0.2px;
+		margin: 1px;
 	}
-
+	
 	.defender-pip {
+		/* box-shadow: inset 0 1px #111, inset 0 -1px #555; */
 		background-color: var(--bs-dark);
 	}
-
 	.attacker-pip {
+		/* box-shadow: inset 0 1px #111, inset 0 -1px #555; */
 		background-color: var(--bs-light);
 	}
 </style>

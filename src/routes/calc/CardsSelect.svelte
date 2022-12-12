@@ -7,6 +7,7 @@
 	type CardState = {
 		value: string;
 		label: string;
+		description: string;
 		active: boolean;
 		disabled: boolean;
 	};
@@ -60,6 +61,7 @@
 				[card.label]: {
 					value: card.value,
 					label: card.label,
+					description: card.description,
 					active: $encounters[$activeEncounterIndex][side].cards.includes(card.value),
 					disabled: isDisabled(card)
 				}
@@ -88,6 +90,7 @@
 				active={cardState.active}
 				disabled={cardState.disabled}
 				class="small-list-item"
+				title={cardState.description}
 			>
 				{cardState.label}
 			</ListGroupItem>
